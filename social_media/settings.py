@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os 
+from datetime import timedelta
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -19,13 +20,16 @@ load_dotenv()
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!=d_9jw3p_%1f@r*=4_80ye0qik98*+87#+16adm5-0zw3_x_j'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.onrender.com', 'localhost']
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000", 
+]
 
 # Application definition
 
@@ -37,10 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
     'users',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -67,6 +74,26 @@ TEMPLATES = [
         },
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'EXCEPTION_HANDLER':'social_media.exceptions.custom_exception_handler'
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=60),  # Access token expires in 60 minutes
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=60),     # Refresh token expires in 1 day
+    'ROTATE_REFRESH_TOKENS': True,                   # Issue new refresh token on refresh
+    'BLACKLIST_AFTER_ROTATION': True,                # Blacklist old refresh tokens
+    'ALGORITHM': 'HS256',                            # JWT signing algorithm
+    'SIGNING_KEY': os.environ.get('SECRET_KEY'),             # Use Django's SECRET_KEY (from .env)
+    'AUTH_HEADER_TYPES': ('Bearer',),                # Token prefix in Authorization header
+}
 
 WSGI_APPLICATION = 'social_media.wsgi.application'
 
