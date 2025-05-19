@@ -1,0 +1,21 @@
+from rest_framework import serializers
+from .models import User
+from django.contrib.auth.hashers import make_password
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username','password', 'phone', 'email']
+        extra_kwargs = {
+            'password':{'write_only':True}
+        }
+
+    def create(self, validated_data):
+        validated_data['password'] = make_password(validated_data['password'])
+        return super(UserSerializer, self).create(validated_data)
+    
+    def validate_phone(self, value):
+        if not value.isdigit():
+            raise serializers.ValidationError("Phone must contain only digits.")
+        return value

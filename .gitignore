@@ -1,0 +1,26 @@
+# Python/Django specific
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+*.log
+migrations/
+*.env
+.env
+.env.*
+!.env.example
+local_settings.py
+*.bak
+
+# Virtual environment
+venv/
+.venv/
+
+
+# IDE/Editor files
+.vscode/
+# OS generated files
+.DS_Store
+Thumbs.db
+
